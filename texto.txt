@@ -1,0 +1,23 @@
+<div data-premium=""  data-adunit="PLOX_CADERNO_POSICAO_5" data-sizes-desktop="[[336,280],[300,250]]" data-sizes-mobile="[[336,280],[300,250]]" >
+</div>
+
+
+<div data-premium=""  data-adunit="PLOX_HOME_POSICAO_1" data-sizes-desktop="[[970,250],[970,90],[728,90]]" data-sizes-mobile="[[320,100],[320,50]]" >
+</div>
+
+
+<div data-premium=""  data-adunit="PLOX_INFEED_06" data-sizes-desktop="[[336,280],[300,250]]" data-sizes-mobile="[[336,280],[300,250]]" >
+</div>
+
+
+<div data-premium=""  data-adunit="PLOX_INTEXT_03" data-sizes-desktop="[[336,280],[300,250]]" data-sizes-mobile="[[336,280],[300,250]]" >
+</div>
+
+
+<script data-cfasync="false" async src="https://tags.premiumads.com.br/dfp/f219b2d5-bec6-4c8d-9f7d-fe29dd4f07b4"></script>
+
+{"imp":[{"ext":{"rubicon":{"zoneId":1866102,"siteId":274244,"accountId":15410},"appnexus":{"placementId":20353579}},"banner":{"format":[{"w":336,"h":280},{"w":300,"h":250},{"w":300,"h":600},{"w":320,"h":50},{"w":320,"h":100}]},"id":"2"}],"ext":{"prebid":{"targeting":{"pricegranularity":{"ranges":[{"max":3,"increment":0.01},{"max":8,"increment":0.05},{"max":20,"increment":0.5}],"precision":2}}}},"id":"1","site":{"ext":{"amp":1},"page":"plox.com.br"}}
+
+
+<amp-auto-ads type="premiumads" data-publisher="f219b2d5-bec6-4c8d-9f7d-fe29dd4f07b4"></amp-auto-ads>
+
