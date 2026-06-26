@@ -366,12 +366,17 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    host, port = "127.0.0.1", 8000
+    # Configuravel por ambiente (HOST/PORT). Default 127.0.0.1:8420 para
+    # rodar atras de um reverse proxy (nginx) na VPS.
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", "8420"))
+    open_browser = os.environ.get("OPEN_BROWSER", "1") != "0"
     server = ThreadingHTTPServer((host, port), Handler)
     url = f"http://{host}:{port}/"
     print(f"Servidor rodando em {url}")
     print("Pressione Ctrl+C para encerrar.")
-    threading.Timer(0.8, lambda: webbrowser.open(url)).start()
+    if open_browser:
+        threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
