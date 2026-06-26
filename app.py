@@ -251,7 +251,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
   <input type="text" id="title" value="Ad Units Manuais | Web">
 
   <label for="src">Cole o texto com os blocos de codigo</label>
-  <textarea id="src" placeholder="Cole aqui o conteudo (ex: o texto.txt)..."></textarea>
+  <textarea id="src" placeholder="Cole aqui o conteudo que contém <div data-adunit>"></textarea>
 
   <div class="row">
     <button class="btn secondary" id="detect">Detectar ad units</button>
