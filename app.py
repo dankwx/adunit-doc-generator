@@ -50,6 +50,8 @@ def parse_text(text: str):
         blocks.append({
             "adunit": adunit,
             "code": code,
+            # tokens p/ a previa fiel no navegador (mesmas cores do .docx)
+            "tokens": tokenize_html(code),
         })
     return blocks
 
@@ -212,6 +214,9 @@ INDEX_HTML = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gerador de Ad Units (.docx)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root { --bg:#1e1e1e; --fg:#e8e8e8; --accent:#ff7c1d; --muted:#9b9b9b; }
   * { box-sizing: border-box; }
@@ -220,82 +225,119 @@ INDEX_HTML = r"""<!DOCTYPE html>
   header { background:#36384c; color:#fff; padding:18px 24px; }
   header h1 { margin:0; font-size:20px; }
   header span { color:var(--accent); }
-  main { max-width:1000px; margin:0 auto; padding:24px; }
+  main { max-width:1400px; margin:0 auto; padding:24px; }
+  .layout { display:flex; gap:24px; align-items:flex-start; }
+  .pane-left { flex:1 1 0; min-width:340px; }
+  .pane-right { flex:1 1 0; min-width:340px; position:sticky; top:24px;
+               align-self:flex-start; }
+  @media (max-width:900px) { .layout { flex-direction:column; }
+               .pane-right { position:static; } }
   label { font-weight:600; display:block; margin:14px 0 6px; }
   input[type=text], textarea { width:100%; padding:10px; border:1px solid #ccc;
          border-radius:6px; font-size:14px; font-family:inherit; }
-  textarea { min-height:220px; font-family:Consolas,monospace; }
+  textarea { min-height:300px; font-family:Consolas,monospace; }
   .btn { background:var(--accent); color:#fff; border:none; padding:10px 18px;
          border-radius:6px; font-size:14px; cursor:pointer; font-weight:600; }
   .btn.secondary { background:#36384c; }
   .btn:disabled { opacity:.5; cursor:not-allowed; }
   .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px; }
-  table { width:100%; border-collapse:collapse; margin-top:18px; }
-  th, td { text-align:left; padding:8px; border-bottom:1px solid #e0e0e0;
-           vertical-align:top; font-size:13px; }
-  th { background:#efefef; }
-  td input { width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; }
-  .code { font-family:Consolas,monospace; background:var(--bg); color:var(--muted);
-          padding:8px; border-radius:4px; display:block; white-space:pre-wrap;
-          word-break:break-all; font-size:12px; }
   .muted { color:#777; font-size:13px; }
   .hide { display:none; }
-  .name { font-weight:700; white-space:nowrap; }
   .err { color:#c0392b; font-weight:600; }
+
+  /* ----- Previa fiel do .docx ----- */
+  .preview-title { font-weight:600; margin:0 0 8px; font-size:13px; color:#555; }
+  .doc { background:#fff; border:1px solid #d9d9d9; border-radius:6px;
+         box-shadow:0 1px 6px rgba(0,0,0,.08); padding:40px 44px;
+         max-height:78vh; overflow:auto; }
+  .doc-h1 { font-family:"Montserrat",sans-serif; font-weight:700; font-size:18px;
+            color:#26292c; margin:0 0 16px; }
+  .doc-unit { font-family:"Montserrat",sans-serif; font-weight:700; font-size:12px;
+              color:#26292c; margin:18px 0 6px; }
+  .doc-code { background:var(--bg); border-radius:2px; padding:8px 10px;
+              font-family:Consolas,"Courier New",monospace; font-size:12px;
+              line-height:1.7; white-space:pre-wrap; word-break:break-all; }
+  .doc-empty { color:#999; font-style:italic; text-align:center; padding:40px 0; }
 </style>
 </head>
 <body>
 <header><h1>Gerador de Ad Units <span>| .docx</span></h1></header>
 <main>
-  <label for="title">Titulo do documento</label>
-  <input type="text" id="title" value="Ad Units Manuais | Web">
+  <div class="layout">
+    <section class="pane-left">
+      <label for="title">Titulo do documento</label>
+      <input type="text" id="title" value="Ad Units Manuais | Web">
 
-  <label for="src">Cole o texto com os blocos de codigo</label>
-  <textarea id="src" placeholder="Cole aqui o conteudo (ex: o texto.txt)..."></textarea>
+      <label for="src">Cole o texto com os blocos de codigo</label>
+      <textarea id="src" placeholder="Cole aqui o conteudo (ex: o texto.txt)..."></textarea>
 
-  <div class="row">
-    <button class="btn secondary" id="detect">Detectar ad units</button>
-    <span class="muted" id="status"></span>
-  </div>
+      <div class="row">
+        <button class="btn secondary" id="detect">Detectar ad units</button>
+        <button class="btn" id="gen" disabled>Gerar DOCX</button>
+        <span class="muted" id="status"></span>
+      </div>
+    </section>
 
-  <div id="result" class="hide">
-    <table id="tbl">
-      <thead>
-        <tr><th style="width:200px">Ad unit</th><th>Codigo</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <div class="row">
-      <button class="btn" id="gen">Gerar DOCX</button>
-    </div>
+    <section class="pane-right">
+      <p class="preview-title">Previa do documento</p>
+      <div class="doc" id="doc">
+        <div class="doc-empty">A previa aparece aqui depois de "Detectar ad units".</div>
+      </div>
+    </section>
   </div>
 </main>
 
 <script>
 let blocks = [];
 
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Monta o HTML colorido de um bloco a partir dos tokens [texto, corHex].
+function codeHtml(tokens) {
+  return (tokens || []).map(([txt, col]) =>
+    `<span style="color:#${col}">${esc(txt)}</span>`).join('');
+}
+
+function renderPreview() {
+  const doc = document.getElementById('doc');
+  const title = document.getElementById('title').value || 'Ad Units Manuais | Web';
+  if (!blocks.length) {
+    doc.innerHTML = '<div class="doc-empty">Nenhum bloco detectado ainda.</div>';
+    return;
+  }
+  let html = `<div class="doc-h1">${esc(title)}</div>`;
+  blocks.forEach(b => {
+    html += `<div class="doc-unit">${esc(b.adunit)}</div>` +
+            `<div class="doc-code">${codeHtml(b.tokens)}</div>`;
+  });
+  doc.innerHTML = html;
+}
+
 document.getElementById('detect').addEventListener('click', async () => {
   const text = document.getElementById('src').value;
   const status = document.getElementById('status');
+  const gen = document.getElementById('gen');
   status.textContent = 'Detectando...';
   const res = await fetch('/parse', {method:'POST', headers:{'Content-Type':'application/json'},
                                      body: JSON.stringify({text})});
   blocks = await res.json();
-  const tbody = document.querySelector('#tbl tbody');
-  tbody.innerHTML = '';
   if (!blocks.length) {
     status.innerHTML = '<span class="err">Nenhum bloco &lt;div data-adunit&gt; encontrado.</span>';
-    document.getElementById('result').classList.add('hide');
+    gen.disabled = true;
+    renderPreview();
     return;
   }
-  blocks.forEach((b, i) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td class="name">${b.adunit}</td>
-      <td><code class="code">${b.code.replace(/</g,'&lt;')}</code></td>`;
-    tbody.appendChild(tr);
-  });
   status.textContent = blocks.length + ' ad unit(s) detectada(s).';
-  document.getElementById('result').classList.remove('hide');
+  gen.disabled = false;
+  renderPreview();
+});
+
+// Mantem a previa em sincronia com o titulo digitado.
+document.getElementById('title').addEventListener('input', () => {
+  if (blocks.length) renderPreview();
 });
 
 document.getElementById('gen').addEventListener('click', async () => {
