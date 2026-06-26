@@ -366,7 +366,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
-    host, port = "127.0.0.1", 8000
+    host, port = "127.0.0.1", 8420
     server = ThreadingHTTPServer((host, port), Handler)
     url = f"http://{host}:{port}/"
     print(f"Servidor rodando em {url}")
